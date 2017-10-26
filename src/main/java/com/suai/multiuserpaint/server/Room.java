@@ -10,6 +10,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import javafx.scene.canvas.Canvas;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
@@ -34,10 +36,11 @@ public class Room {
         idRoom = ++id;
         this.name = name;
         this.admin = admin;
-        addUser(this.admin);
+        canvas = new Canvas(Server.width, Server.height);
+        join(this.admin);
         
         //высоту и ширину мб считывать с файла конфигураций
-        canvas = new Canvas(Server.width, Server.height);
+        
     }
 
     
@@ -48,21 +51,27 @@ public class Room {
         params.setFill(Color.TRANSPARENT);  
         return canvas.snapshot(params, null);
     }
-    public void addUser(User user)
+    // подключившумуся отправляем текущее состояине холста
+    public void join(User user)
     {
         users.add(user);
+        try {
+            user.getThisObjectOutputStream().writeObject(getSnapshot());
+        } catch (IOException ex) {
+            
+        }
     }
     
-    private void broadcast(ArrayList<User> users, WritableImage image) 
+    private void broadcast(ArrayList<User> users, String changes) 
     {
 	try 
         {
             for (User user : users)
-                user.getThisObjectOutputStream().writeObject(image); 
+                user.getThisObjectOutputStream().writeObject(changes); 
 	} 
         catch (SocketException e) 
         {
- 
+            
             //обработать диссконект пользователя
             
 	} 
@@ -70,5 +79,18 @@ public class Room {
         {
             e.printStackTrace();
 	}
+    }
+    public String toString()
+    {
+        return name;
+    }
+    public int getId()
+    {
+        return id;
+    }
+    
+    public void update(String changes)
+    {
+        
     }
 }

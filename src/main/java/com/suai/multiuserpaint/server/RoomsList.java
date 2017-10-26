@@ -14,12 +14,20 @@ import java.util.Map;
  */
 public class RoomsList {
     private Map<String, Room> rooms = new HashMap<String, Room>();
+    
+    public void add(Room room) 
+    {
+        System.out.println( "Комната" + room +" создана" );
+        rooms.put(room.toString(), room);
+    }
+        
     public void add(User admin, String name) 
     {
         System.out.println( "Комната" + name +" создана" );
         rooms.put(name , new Room(admin, name));
 
     }
+
     
     public String[] getRooms() 
     {

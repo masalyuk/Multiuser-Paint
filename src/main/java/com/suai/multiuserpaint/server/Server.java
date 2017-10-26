@@ -36,7 +36,7 @@ public class Server {
                 while(user == null) 
                       user = socketListener.accept();
                             
-                //new ClientThread(client); //Создаем новый поток, которому передаем сокет
+                new UserThread(user); //Создаем новый поток, которому передаем сокет
             }
 	} 
         catch (SocketException e) 
