@@ -17,13 +17,13 @@ public class RoomsList {
     
     public void add(Room room) 
     {
-        System.out.println( "Комната" + room +" создана" );
+        System.out.println( "Комната " + room +" создана" );
         rooms.put(room.toString(), room);
     }
         
     public void add(User admin, String name) 
     {
-        System.out.println( "Комната" + name +" создана" );
+        System.out.println( "Комната " + name +" создана" );
         rooms.put(name , new Room(admin, name));
 
     }

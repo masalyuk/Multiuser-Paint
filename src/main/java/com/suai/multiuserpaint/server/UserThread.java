@@ -11,6 +11,10 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 /**
  *
@@ -22,10 +26,14 @@ public class UserThread extends Thread{
     private ObjectOutputStream outputStream ;
     private ObjectInputStream inputStream;
     private Room room;
+    private User user;
+    private static int id = -1;
     
     public UserThread(Socket socket) 
     {
+        this.id++;
         this.socket = socket;
+        System.out.println("Join: "  + socket.getInetAddress().toString());
         this.start();
     }
     
@@ -37,43 +45,45 @@ public class UserThread extends Thread{
             inputStream  = new ObjectInputStream(socket.getInputStream());
             
             //отправляем клинту список текущих комнат
+            outputStream.writeObject(id);
             outputStream.writeObject(Server.getRoomList().getRooms());
             
             //получаем ответ о создании или подключении к комнате
-            String answer = (String)inputStream.readObject();
+            String[] answer = (String[])inputStream.readObject();
             
-            //мб добавить регулярки
-            if(answer.split(" ")[0].equals("n"))
+            if(answer[0].equals("n"))
             {
-                room = new Room(new User(socket,outputStream, inputStream), answer.split(" ")[1]);
+                System.out.println("Client: " + (id-1) + " creating room with name: " + answer[1]);
+                user = new User(socket,outputStream, inputStream);
+                room = new Room(user, answer[1]);                
                 Server.getRoomList().add(room);
             }
             else
             {
-                room =  Server.getRoomList().getRoom(answer.split(" ")[1]);
-                room.join(new User(socket,outputStream, inputStream));
-            }
-               
-
+                room =  Server.getRoomList().getRoom(answer[1]);
+                user = new User(socket,outputStream, inputStream);
+                room.join(user);
+            } 
+            
             while(true)
             {
-                //получаем обновления рисования 
-                String changes = (String)inputStream.readObject();
-                room.update(changes);
-     
-                //отсылаем комнате
+                String[] changes = (String[])inputStream.readObject();
+                room.addAction(user, changes);
+                
             }
-            
-        
-
 	}
         catch(IOException e)
         {
-            System.out.println(e.getMessage());
+            try {
+                socket.close();
+            } catch (IOException ex) {
+                Logger.getLogger(UserThread.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           System.out.println("User:" + user.getSocket().getInetAddress() + " EXEPTION: " + e.getMessage());
         } catch (ClassNotFoundException ex) 
         {
             
-        }
+        } 
 
     }
 }

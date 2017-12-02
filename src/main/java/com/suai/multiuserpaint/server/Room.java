@@ -1,96 +1,92 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.suai.multiuserpaint.server;
 
+import com.suai.multiuserpaint.history.History;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
-import javafx.scene.canvas.Canvas;
-import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.image.WritableImage;
-import javafx.scene.paint.Color;
 
 /**
  *
  * @author nikit
  */
-public class Room {
+public class Room{
     
     private String name;
     private static int id = 0;
     private int idRoom;
+    private History history = new History();
     
-    private ArrayList<User> users;
+    private ArrayList<User> users = new ArrayList();
     private User admin;
     
-    private Canvas canvas;
     
-    public Room(User admin,String name)
+    public Room(User admin, String name)
     {
         idRoom = ++id;
         this.name = name;
         this.admin = admin;
-        canvas = new Canvas(Server.width, Server.height);
-        join(this.admin);
-        
-        //высоту и ширину мб считывать с файла конфигураций
-        
+        join(admin);
     }
-
-    
-    
-    public WritableImage getSnapshot()
-    {
-        SnapshotParameters params = new SnapshotParameters();
-        params.setFill(Color.TRANSPARENT);  
-        return canvas.snapshot(params, null);
-    }
+ 
     // подключившумуся отправляем текущее состояине холста
     public void join(User user)
     {
         users.add(user);
+        history.addUser(user);
         try {
-            user.getThisObjectOutputStream().writeObject(getSnapshot());
+            System.out.println("К комнате " + idRoom + "присоединился" + user);
+            user.getThisObjectOutputStream().writeObject(history.getHistory());
         } catch (IOException ex) {
-            
+            System.out.println("Join(): " + id + ex.getMessage());
         }
     }
     
-    private void broadcast(ArrayList<User> users, String changes) 
+    
+    private void broadcast(String changes[]) 
     {
+        User tmp = null;
 	try 
         {
             for (User user : users)
+            {
+                tmp = user;
+                if(changes == null)
+                    System.out.println("ИЗМЕНЕНИЯ НУЛЛ ");
+                
                 user.getThisObjectOutputStream().writeObject(changes); 
+                
+            }
+                
 	} 
         catch (SocketException e) 
         {
-            
-            //обработать диссконект пользователя
-            
+            users.remove(tmp);
+            System.out.println("Socket ex:broadcast " + e.getMessage());
 	} 
         catch (IOException e) 
         {
-            e.printStackTrace();
-	}
+            users.remove(tmp);
+            System.out.println("IO ex: broadcast " + e.getMessage());
+        }
     }
+    
     public String toString()
     {
         return name;
     }
+    
     public int getId()
     {
         return id;
     }
-    
-    public void update(String changes)
-    {
+
+    void addAction(User user, String[] changes) {
+        history.addAction(user, changes);
+        broadcast(changes);
         
     }
+
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="458.0" prefWidth="320" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.suai.paintclient.MainWindowController">
+   <children>
+      <VBox layoutX="-2.0" prefHeight="458.0" prefWidth="320.0">
+         <children>
+            <TableView fx:id="tblRooms" prefHeight="500.0" prefWidth="320.0">
+               <columns>
+                  <TableColumn fx:id="clmRooms" prefWidth="319.0" text="List rooms" />
+               </columns>
+            </TableView>
+            <HBox prefHeight="260.0" prefWidth="320.0">
+               <children>
+                  <Button fx:id="btnJoin" mnemonicParsing="false" onAction="#join" text="Присоединиться">
+                     <opaqueInsets>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </opaqueInsets>
+                  </Button>
+                  <Button fx:id="btnCreate" alignment="BASELINE_RIGHT" mnemonicParsing="false" onAction="#createRoom" text="Создать новую">
+                     <opaqueInsets>
+                        <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
+                     </opaqueInsets>
+                  </Button>
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

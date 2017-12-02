@@ -6,20 +6,30 @@
 package com.suai.multiuserpaint.server;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.LinkedList;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 /**
  *
  * @author nikit
  */
-public class Server {
+public class Server{
     private static RoomsList rooms = new RoomsList();
-    private static int port = 7124;
+    private static int port = 7000;
     public static final int height = 600;
-     public static final int width = 600;
+    public static final int width = 600;
+     
+ 
     
     // Width and height of Canvas
     
@@ -27,12 +37,15 @@ public class Server {
     {
         try 
         {
-            System.out.println("Сервер запущен");
-
+            
+            
             ServerSocket socketListener = new ServerSocket(port);
+            System.out.println("Сервер запущен " + socketListener.getInetAddress().toString() + port);
+            
             while (true) 
             {
                 Socket user = null;
+                
                 while(user == null) 
                       user = socketListener.accept();
                             
@@ -42,12 +55,10 @@ public class Server {
         catch (SocketException e) 
         {
             System.err.println("So.8cket exception");
-            e.printStackTrace();
         } 
         catch (IOException e) 
         {
             System.err.println("I/O exception");  
-            e.printStackTrace();
 	}
     }
     public static void createRoom(User user, String name)
@@ -58,5 +69,7 @@ public class Server {
     {
 		return rooms;
     }
+
+   
     
 }
